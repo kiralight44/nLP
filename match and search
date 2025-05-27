@@ -1,0 +1,23 @@
+import re
+
+text = "The rain in Spain stays mainly in the plain."
+
+pattern = r"rain"
+match = re.search(pattern, text)
+if match:
+    print(f"Found '{match.group()}' at position {match.start()}")
+
+pattern = r"^The.*plain\.$"
+if re.match(pattern, text):
+    print("The text matches the entire pattern.")
+
+pattern = r"in"
+matches = re.findall(pattern, text)
+print(f"Found '{pattern}' {len(matches)} times.")
+
+new_text = re.sub(r"Spain", "France", text)
+print(f"Updated text: {new_text}")
+
+pattern = r"(\w+) in (\w+)"
+matches = re.findall(pattern, text)
+print("Extracted pairs:", matches)
