@@ -1,0 +1,27 @@
+import nltk
+
+class ParseTreeGenerator:
+    def __init__(self, grammar):
+        self.grammar = grammar
+
+    def generate_parse_tree(self, sentence):
+        parser = nltk.ChartParser(self.grammar)
+        trees = list(parser.parse(sentence.split()))
+        return trees
+
+if __name__ == "__main__":
+    grammar = nltk.CFG.fromstring("""
+        S -> NP VP
+        NP -> Det N
+        VP -> V NP | V
+        Det -> 'the' | 'a'
+        N -> 'cat' | 'dog'
+        V -> 'chased' | 'saw'
+    """)
+
+    sentence = "the cat chased a dog"
+    generator = ParseTreeGenerator(grammar)
+    parse_trees = generator.generate_parse_tree(sentence)
+
+    for tree in parse_trees:
+        tree.pretty_print()
