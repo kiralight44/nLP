@@ -1,0 +1,56 @@
+import nltk
+
+class AgreementChecker:
+    def __init__(self, grammar):
+        self.grammar = grammar
+
+    def check_agreement(self, sentence):
+        tokens = nltk.word_tokenize(sentence)
+        tagged = nltk.pos_tag(tokens)
+
+        subject = None
+        verb = None
+
+        for word, tag in tagged:
+            if tag.startswith('NN'):  # Nouns
+                subject = word
+            elif tag.startswith('VB'):  # Verbs
+                verb = word
+
+        if subject and verb:
+            return self._is_agreement(subject, verb)
+        return False
+
+    def _is_agreement(self, subject, verb):
+        subject_number = self._get_number(subject)
+        verb_number = self._get_number(verb)
+
+        return subject_number == verb_number
+
+    def _get_number(self, word):
+        singular_nouns = {'cat', 'dog', 'child', 'man', 'woman'}
+        plural_nouns = {'cats', 'dogs', 'children', 'men', 'women'}
+        singular_verbs = {'is', 'chases', 'sees'}
+        plural_verbs = {'are', 'chase', 'see'}
+
+        if word in singular_nouns or word in singular_verbs:
+            return 'singular'
+        elif word in plural_nouns or word in plural_verbs:
+            return 'plural'
+        return None
+
+if __name__ == "__main__":
+    grammar = nltk.CFG.fromstring("""
+        S -> NP VP
+        NP -> Det N
+        VP -> V NP | V
+        Det -> 'the' | 'a'
+        N -> 'cat' | 'dog' | 'children' | 'men'
+        V -> 'chases' | 'see' | 'are' | 'is'
+    """)
+
+    checker = AgreementChecker(grammar)
+    sentence = "The cat chases the dog."
+    result = checker.check_agreement(sentence)
+
+    print("Agreement check:", result)
