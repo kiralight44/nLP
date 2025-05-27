@@ -1,0 +1,49 @@
+class TopDownParser:
+    def __init__(self, grammar):
+        self.grammar = grammar
+
+    def parse(self, tokens):
+        self.tokens = tokens
+        self.position = 0
+        return self._parse_nonterminal('S')
+
+    def _parse_nonterminal(self, nonterminal):
+        if nonterminal not in self.grammar:
+            return False
+
+        for production in self.grammar[nonterminal]:
+            saved_position = self.position
+            if self._parse_production(production):
+                return True
+            self.position = saved_position
+        
+        return False
+
+    def _parse_production(self, production):
+        for symbol in production:
+            if self.position >= len(self.tokens):
+                return False
+            if symbol in self.grammar:  # Non-terminal
+                if not self._parse_nonterminal(symbol):
+                    return False
+            elif symbol == self.tokens[self.position]:  # Terminal
+                self.position += 1
+            else:
+                return False
+        return True
+
+if __name__ == "__main__":
+    grammar = {
+        'S': [['NP', 'VP']],
+        'NP': [['Det', 'N']],
+        'VP': [['V', 'NP'], ['V']],
+        'Det': [['the'], ['a']],
+        'N': [['cat'], ['dog']],
+        'V': [['chased'], ['saw']]
+    }
+
+    parser = TopDownParser(grammar)
+    tokens = ['the', 'cat', 'chased', 'a', 'dog']
+    result = parser.parse(tokens)
+
+    print("Parsing successful:", result)
