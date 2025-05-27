@@ -1,0 +1,55 @@
+class EarleyParser:
+    def __init__(self, grammar):
+        self.grammar = grammar
+        self.start_symbol = next(iter(grammar))
+
+    def parse(self, tokens):
+        n = len(tokens)
+        chart = [[] for _ in range(n + 1)]
+        chart[0].append((self.start_symbol, 0, 0))  # (non-terminal, dot position, origin)
+
+        for i in range(n + 1):
+            for j in range(len(chart[i])):
+                rule = chart[i][j]
+                self._process_rule(rule, i, chart)
+
+            if i < n:
+                self._scan(tokens[i], i, chart)
+
+        return any(rule[0] == self.start_symbol and rule[1] == len(self.grammar[rule[0]][0]) for rule in chart[n])
+
+    def _process_rule(self, rule, i, chart):
+        non_terminal, dot, origin = rule
+        if dot < len(self.grammar[non_terminal]):
+            next_symbol = self.grammar[non_terminal][dot]
+            if next_symbol in self.grammar:  # Non-terminal
+                for production in self.grammar[next_symbol]:
+                    chart[i].append((next_symbol, 0, i))
+        else:
+            chart[i].append((non_terminal, dot + 1, origin))
+
+    def _scan(self, token, i, chart):
+        for rule in chart[i]:
+            non_terminal, dot, origin = rule
+            if dot < len(self.grammar[non_terminal]) and self.grammar[non_terminal][dot] == token:
+                chart[i + 1].append((non_terminal, dot + 1, origin))
+
+if __name__ == "__main__":
+    grammar = {
+        'S': ['NP VP'],
+        'NP': ['Det N'],
+        'VP': ['V NP', 'V'],
+        'Det': ['the', 'a'],
+        'N': ['cat', 'dog'],
+        'V': ['chased', 'saw']
+    }
+
+    # Convert grammar to a more usable format
+    for key in grammar:
+        grammar[key] = [prod.split() for prod in grammar[key]]
+
+    parser = EarleyParser(grammar)
+    tokens = ['the', 'cat', 'chased', 'a', 'dog']
+    result = parser.parse(tokens)
+
+    print("Parsing successful:", result)
