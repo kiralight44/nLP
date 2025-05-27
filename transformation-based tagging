@@ -1,0 +1,42 @@
+import nltk
+import re
+
+class TransformationBasedTagger:
+    def __init__(self):
+        self.rules = [
+            (r'(?<=[A-Z])[a-z]+$', 'NNP'),
+            (r'\b(?:I|you|he|she|it|we|they)\b', 'PRP'),
+            (r'\b(?:a|an|the)\b', 'DT'),
+            (r'.*ed$', 'VBD'),
+            (r'.*ing$', 'VBG'),
+            (r'\b(?:quick|lazy|happy)\b', 'JJ'),
+            (r'\b(?:cat|dog|car|language)\b', 'NN'),
+            (r'\b(?:cats|dogs|cars|languages)\b', 'NNS'),
+            (r'\b(?:is|are|was|were)\b', 'VBZ'),
+        ]
+
+    def initial_tagging(self, sentence):
+        tokens = nltk.word_tokenize(sentence)
+        tagged = nltk.pos_tag(tokens)
+        return tagged
+
+    def apply_rules(self, tagged):
+        for i, (word, tag) in enumerate(tagged):
+            for pattern, new_tag in self.rules:
+                if re.fullmatch(pattern, word):
+                    tagged[i] = (word, new_tag)
+                    break
+        return tagged
+
+    def tag(self, sentence):
+        initial_tags = self.initial_tagging(sentence)
+        final_tags = self.apply_rules(initial_tags)
+        return final_tags
+
+if __name__ == "__main__":
+    text = "The quick brown fox jumps over the lazy dog."
+    tagger = TransformationBasedTagger()
+    tagged_output = tagger.tag(text)
+
+    for word, tag in tagged_output:
+        print(f"{word}: {tag}")
