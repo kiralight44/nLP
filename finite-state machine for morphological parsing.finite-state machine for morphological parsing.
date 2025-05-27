@@ -1,0 +1,42 @@
+class PluralizerFSM:
+    def __init__(self):
+        self.state = 'start'
+
+    def transition(self, noun):
+        if self.state == 'start':
+            if noun.endswith('y') and noun[-2] not in 'aeiou':
+                self.state = 'consonant_y'
+            elif noun.endswith(('s', 'x', 'z', 'ch', 'sh')):
+                self.state = 's_suffix'
+            else:
+                self.state = 'default'
+        
+        if self.state == 'consonant_y':
+            return noun[:-1] + 'ies'
+        elif self.state == 's_suffix':
+            return noun + 'es'
+        else:
+            return noun + 's'
+
+    def pluralize(self, noun):
+        return self.transition(noun)
+
+
+if __name__ == "__main__":
+    pluralizer = PluralizerFSM()
+    
+    nouns = [
+        "cat",
+        "dog",
+        "baby",
+        "party",
+        "box",
+        "church",
+        "wish",
+        "car",
+        "bus"
+    ]
+
+    for noun in nouns:
+        plural_form = pluralizer.pluralize(noun)
+        print(f"The plural of '{noun}' is '{plural_form}'.")
