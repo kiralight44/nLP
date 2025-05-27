@@ -1,0 +1,38 @@
+import re
+import nltk
+
+class RuleBasedPOSTagger:
+    def __init__(self):
+        self.rules = [
+            (r'.*ed$', 'VBD'),
+            (r'.*ing$', 'VBG'),
+            (r'\b(?:I|you|he|she|it|we|they)\b', 'PRP'),
+            (r'\b(?:a|an|the)\b', 'DT'),
+            (r'\b(?:quick|lazy|happy)\b', 'JJ'),
+            (r'\b(?:cat|dog|car|language)\b', 'NN'),
+            (r'\b(?:cats|dogs|cars|languages)\b', 'NNS'),
+            (r'\b(?:is|are|was|were)\b', 'VBZ'),
+            (r'\w+', 'NN')  # Default to noun
+        ]
+
+    def tag(self, sentence):
+        tokens = nltk.word_tokenize(sentence)
+        tagged = []
+
+        for word in tokens:
+            tag = 'NN'  # Default tag
+            for pattern, tag_name in self.rules:
+                if re.fullmatch(pattern, word):
+                    tag = tag_name
+                    break
+            tagged.append((word, tag))
+
+        return tagged
+
+if __name__ == "__main__":
+    text = "The quick brown fox jumps over the lazy dog."
+    tagger = RuleBasedPOSTagger()
+    tagged_output = tagger.tag(text)
+
+    for word, tag in tagged_output:
+        print(f"{word}: {tag}")
