@@ -1,0 +1,28 @@
+from nltk.corpus import wordnet as wn
+from nltk.wsd import lesk
+
+class WordSenseDisambiguation:
+    def __init__(self, sentence, target_word):
+        self.sentence = sentence
+        self.target_word = target_word
+
+    def disambiguate(self):
+        # Use the Lesk algorithm to find the best sense of the target word
+        sense = lesk(self.sentence.split(), self.target_word)
+        return sense
+
+if __name__ == "__main__":
+    # Example sentence and target word
+    sentence = "I went to the bank to deposit some money."
+    target_word = "bank"
+
+    wsd = WordSenseDisambiguation(sentence, target_word)
+    sense = wsd.disambiguate()
+
+    if sense:
+        print(f"Best sense for '{target_word}':")
+        print(f"Synset: {sense.name()}")
+        print(f"Definition: {sense.definition()}")
+        print(f"Examples: {sense.examples()}")
+    else:
+        print(f"No sense found for the word '{target_word}'.")
