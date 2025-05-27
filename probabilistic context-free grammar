@@ -1,0 +1,36 @@
+import nltk
+from nltk import ProbabilisticGrammar
+
+class PCFGParser:
+    def __init__(self, grammar):
+        self.grammar = grammar
+
+    def parse(self, sentence):
+        parser = nltk.ViterbiParser(self.grammar)
+        trees = list(parser.parse(sentence.split()))
+        return trees
+
+if __name__ == "__main__":
+    grammar = nltk.PCFG.fromstring("""
+        S -> NP VP [1.0]
+        NP -> Det N [0.6]
+        NP -> Det N PP [0.4]
+        VP -> V NP [0.7]
+        VP -> V [0.3]
+        Det -> 'the' [0.5]
+        Det -> 'a' [0.5]
+        N -> 'cat' [0.4]
+        N -> 'dog' [0.4]
+        N -> 'treat' [0.2]
+        V -> 'chases' [0.5]
+        V -> 'sees' [0.5]
+        PP -> P NP [1.0]
+        P -> 'with' [1.0]
+    """)
+
+    sentence = "the cat chases the dog"
+    parser = PCFGParser(grammar)
+    parse_trees = parser.parse(sentence)
+
+    for tree in parse_trees:
+        tree.pretty_print()
