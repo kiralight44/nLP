@@ -1,0 +1,20 @@
+import nltk
+from nltk.stem import PorterStemmer
+from nltk.stem import WordNetLemmatizer
+from nltk.tokenize import word_tokenize
+
+nltk.download('punkt')
+nltk.download('wordnet')
+
+text = "The cats are running and they are happier than ever."
+
+tokens = word_tokenize(text)
+print("Tokens:", tokens)
+
+stemmer = PorterStemmer()
+stems = [stemmer.stem(token) for token in tokens]
+print("Stems:", stems)
+
+lemmatizer = WordNetLemmatizer()
+lemmas = [lemmatizer.lemmatize(token) for token in tokens]
+print("Lemmas:", lemmas)
