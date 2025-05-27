@@ -1,0 +1,49 @@
+class FiniteStateAutomaton:
+    def __init__(self):
+        self.state = 0 
+
+    def transition(self, char):
+        if self.state == 0:
+            if char == 'a':
+                self.state = 1 
+            else:
+                self.state = 0 
+        elif self.state == 1:
+            if char == 'b':
+                self.state = 2 
+            else:
+                self.state = 0
+        elif self.state == 2:
+            if char == 'a':
+                self.state = 1  
+            else:
+                self.state = 0  
+
+    def accepts(self, input_string):
+      
+        for char in input_string:
+            self.transition(char)
+        return self.state == 2
+
+
+# Example usage
+if __name__ == "__main__":
+    fsa = FiniteStateAutomaton()
+    
+    # Test strings
+    test_strings = [
+        "a",     
+        "ab",   
+        "cab",  
+        "aab",  
+        "abc",   
+        "abab", 
+        "ababab", 
+        "b",    
+        "ba",   
+        "aabb"   
+    ]
+
+    for s in test_strings:
+        result = fsa.accepts(s)
+        print(f"The string '{s}' is {'accepted' if result else 'not accepted'}.")
