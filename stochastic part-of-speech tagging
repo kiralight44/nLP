@@ -1,0 +1,58 @@
+import random
+from collections import defaultdict
+
+class SimplePOSTagger:
+    def __init__(self):
+        self.transition_probs = defaultdict(lambda: defaultdict(float))
+        self.emission_probs = defaultdict(lambda: defaultdict(float))
+        self.tags = set()
+
+    def train(self, tagged_sentences):
+        for sentence in tagged_sentences:
+            for i in range(len(sentence) - 1):
+                word, tag = sentence[i]
+                next_word, next_tag = sentence[i + 1]
+                self.transition_probs[tag][next_tag] += 1
+                self.emission_probs[tag][word] += 1
+                self.tags.add(tag)
+        
+        for tag in self.transition_probs:
+            total = sum(self.transition_probs[tag].values())
+            for next_tag in self.transition_probs[tag]:
+                self.transition_probs[tag][next_tag] /= total
+        
+        for tag in self.emission_probs:
+            total = sum(self.emission_probs[tag].values())
+            for word in self.emission_probs[tag]:
+                self.emission_probs[tag][word] /= total
+
+    def tag(self, sentence):
+        tagged_sentence = []
+        current_tag = random.choice(list(self.tags))
+        
+        for word in sentence:
+            if current_tag in self.emission_probs and word in self.emission_probs[current_tag]:
+                tagged_sentence.append((word, current_tag))
+            else:
+                tagged_sentence.append((word, 'NN'))  # Default to noun if unknown
+            next_tags = self.transition_probs[current_tag]
+            if next_tags:
+                current_tag = random.choices(list(next_tags.keys()), weights=list(next_tags.values()))[0]
+        
+        return tagged_sentence
+
+if __name__ == "__main__":
+    training_data = [
+        [("I", "PRP"), ("love", "VBP"), ("natural", "JJ"), ("language", "NN"), ("processing", "NN")],
+        [("NLTK", "NNP"), ("is", "VBZ"), ("a", "DT"), ("powerful", "JJ"), ("library", "NN")],
+        [("He", "PRP"), ("enjoys", "VBZ"), ("learning", "VBG"), ("about", "IN"), ("language", "NN")]
+    ]
+
+    tagger = SimplePOSTagger()
+    tagger.train(training_data)
+
+    test_sentence = ["I", "enjoy", "learning", "NLTK"]
+    tagged_output = tagger.tag(test_sentence)
+
+    for word, tag in tagged_output:
+        print(f"{word}: {tag}")
